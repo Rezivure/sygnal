@@ -18,6 +18,9 @@ spec:
       containers:
         - name: sygnal
           image: mygridapp/push-gateway:latest
+          env:
+            - name: SYGNAL_CONF
+              value: /etc/sygnal/sygnal.yaml
           ports:
             - containerPort: 5000
           resources:
