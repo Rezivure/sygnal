@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ntfy-config
+  namespace: matrix
+  labels:
+    app: ntfy
+data:
+  server.yml: |
+    base-url: https://push.mygrid.app
+    listen-http: ":80"
+    cache-file: /var/cache/ntfy/cache.db
+    cache-duration: "12h"
+    behind-proxy: true
+    upstream-base-url: ""

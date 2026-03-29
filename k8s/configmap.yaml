@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sygnal-config
+  namespace: matrix
+  labels:
+    app: sygnal
+data:
+  sygnal.yaml: |
+    log:
+      setup:
+        version: 1
+        formatters:
+          normal:
+            format: "%(asctime)s %(levelname)s %(name)s %(message)s"
+        handlers:
+          console:
+            class: logging.StreamHandler
+            formatter: normal
+        root:
+          level: info
+          handlers: [console]
+
+    http:
+      bind_addresses: ["0.0.0.0"]
+      port: 5000
+
+    apps:
+      app.mygrid.grid.ios:
+        type: apns
+        keyfile: /etc/sygnal/apns-key.p8
+        key_id: "366RC65T76"
+        team_id: "45NCU5QA4S"
+        topic: app.mygrid.grid
+        push_mode: production
+
+      app.mygrid.grid.android:
+        type: gcm
+        api_version: v1
+        project_id: grid-app-2480d
+        service_account_file: /etc/sygnal/fcm-key.json

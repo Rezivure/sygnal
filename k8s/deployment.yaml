@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sygnal
+  namespace: matrix
+  labels:
+    app: sygnal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sygnal
+  template:
+    metadata:
+      labels:
+        app: sygnal
+    spec:
+      containers:
+        - name: sygnal
+          image: mygridapp/push-gateway:latest
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          volumeMounts:
+            - name: apns-key
+              mountPath: /etc/sygnal/apns-key.p8
+              subPath: apns-key
+              readOnly: true
+            - name: fcm-key
+              mountPath: /etc/sygnal/fcm-key.json
+              subPath: fcm-key
+              readOnly: true
+            - name: config
+              mountPath: /etc/sygnal/sygnal.yaml
+              subPath: sygnal.yaml
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: apns-key
+          secret:
+            secretName: sygnal-apns
+        - name: fcm-key
+          secret:
+            secretName: sygnal-fcm
+        - name: config
+          configMap:
+            name: sygnal-config
