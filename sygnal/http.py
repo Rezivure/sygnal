@@ -34,6 +34,7 @@ from sygnal.exceptions import (
     NotificationDispatchException,
 )
 from sygnal.notifications import Notification, NotificationContext, Pushkin
+from sygnal.grid_filter import should_send_push
 from sygnal.utils import NotificationLoggerAdapter, json_decoder
 
 if TYPE_CHECKING:
@@ -242,6 +243,14 @@ class V1NotifyHandler(Resource):
         context: the context of the notification
         """
         try:
+            if not should_send_push(notif):
+                request.write(json.dumps({"rejected": []}).encode())
+                request.finish()
+                PUSHGATEWAY_HTTP_RESPONSES_COUNTER.labels(code=request.code).inc()
+                root_span.set_tag(tags.HTTP_STATUS_CODE, request.code)
+                root_span.finish()
+                return
+
             rejected = []
 
             for d in notif.devices:
