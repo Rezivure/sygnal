@@ -32,7 +32,13 @@ data:
         key_id: "366RC65T76"
         team_id: "45NCU5QA4S"
         topic: app.mygrid.grid
-        push_mode: production
+        # Sygnal's platform key (push_mode was ignored as unrecognized).
+        platform: production
+        # Grid's iOS client posts the APNs device token already hex-encoded
+        # (via FirebaseMessaging.getAPNSToken()). Default is true which would
+        # base64-decode our hex and re-hex it into garbage, yielding
+        # BadDeviceToken on every push.
+        convert_device_token_to_hex: false
 
       app.mygrid.grid.android:
         type: gcm
